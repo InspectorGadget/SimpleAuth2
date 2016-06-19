@@ -1,8 +1,9 @@
-# SimpleAuth2 (By Shoghicp)
+# SimpleAuth2 (Shoghicp/Awzaw)
 
-### Hack detection and PIN codes by Awzaw
+### Automatic Hack protection using IP/CID/SKIN and user PIN codes
+
 ### IMPORTANT
-### TO UPDATE AN EXISTING MySQL or SQLITE DATABASE PLEASE RUN THE FOLLOWING QUERIES. FOR THE CAUTIOUS, STOP YOUR SERVER AND BACKUP THE DATABASE FIRST:
+TO UPDATE AN EXISTING MySQL or SQLITE DATABASE PLEASE RUN THE FOLLOWING QUERIES. FOR THE CAUTIOUS, STOP YOUR SERVER AND BACKUP THE DATABASE FIRST:
 
 * `ALTER TABLE simpleauth.simpleauth_players ADD ip VARCHAR(50);`
 * `ALTER TABLE simpleauth.simpleauth_players ADD cid BIGINT;`
