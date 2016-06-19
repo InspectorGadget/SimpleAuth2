@@ -1,4 +1,12 @@
-# SimpleAuth2 (By Shoghicp, hack detection and PIN codes by Awzaw)
+# SimpleAuth2 (By Shoghicp)
+
+## Hack detection and PIN codes by Awzaw
+##IMPORTANT TO UPDATE EXISITING MySQL or SQLITE DATABASE PLEASE RUN THE FOLLOWING QUERIES. FOR THE CAUTIOUS, STOP YOUR SERVER AND BACKUP THE DATABASE FIRST
+
+* `ALTER TABLE simpleauth.simpleauth_players ADD ip VARCHAR(50);`
+* `ALTER TABLE simpleauth.simpleauth_players ADD cid BIGINT;`
+* `ALTER TABLE simpleauth.simpleauth_players ADD skinhash VARCHAR(60);`
+* `ALTER TABLE simpleauth.simpleauth_players ADD pin INT;`
 
 Plugin for PocketMine-MP that prevents people to impersonate an account, requering registration and login when connecting.
 
@@ -20,7 +28,7 @@ Plugin for PocketMine-MP that prevents people to impersonate an account, requeri
 
 
 * `/login <password>`
-* `/login <password> <PIN>` (If 2 changes detected for IP, SKIN or CID)
+* `/login <password> <PIN>` (If 2 changes detected for a players IP, SKIN or CID since last login)
 * `/register <password>`
 * `/unregister <password>` (TODO)
 * For OPs: `/simpleauth <command: help|unregister> [parameters...]` (TODO)
