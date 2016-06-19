@@ -35,19 +35,21 @@ Plugin for PocketMine-MP that prevents people to impersonate an account, requeri
 
 ## What's New?
 
-This fork of SimpleAuth (not forked because the original will never update) adds automatic hack detection to SimpleAuth.
+This fork of SimpleAuth (not forked because the original will probably never be updated) adds automatic hack detection/protection to SimpleAuth.
 
-When users register (or logs in the first time after install or upgrade) they will be given a 4 digit PIN code.
+When users register (or log in the first time after install or upgrade) they will be given a 4 digit PIN code.
 
-If any player tries to login to the account with more than 1 change to either their previous IP, CID or SKIN then they will
+If any player tries to login to an account with more than 1 change to either the previously recorded IP, CID or SKIN then they will
 need to login with `/login <password> <PIN>`, for example, `/login zuckerberg dadada 1234`. They will then receive a new PIN.
 
-If a user only changes IP, SKIN or CID the PIN is not required, and the players security info is updated (not the PIN).
+If a user only changes IP, SKIN or CID the PIN is not required, and the players security info is updated for the new IP/CID/SKIN (not the PIN).
 
 If a player forgets their PIN, and cannot login because they joined with a new SKIN + IP, SKIN + CID, IP + CID or SKIN + CID
 their security info can be reset on CONSOLE with `login <player>`. They will then get a new PIN code next time they login.
 
-SimpleAuth2 is compatible with SimpleAuthHelper, and works with any provider: MySQL, YAML and SQLITE (untested)
+Warnings are displayed on Console when players try to join with > 2 changes to the security info.
+
+SimpleAuth2 is compatible with SimpleAuthHelper, and works with any provider: MySQL (tested), YAML (tested) and SQLITE (untested)
 
 ## Commands
 
