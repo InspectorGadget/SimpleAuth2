@@ -35,7 +35,7 @@ Plugin for PocketMine-MP that prevents people to impersonate an account, requeri
 
 ## What's New?
 
-This fork of SimpleAuth (not forked because the original will probably never be updated) adds automatic hack detection/protection to SimpleAuth.
+This version of SimpleAuth (not forked because the original will probably never be updated) adds automatic hack detection/protection to SimpleAuth.
 
 When users register (or log in the first time after install or upgrade) they will be given a 4 digit PIN code.
 
