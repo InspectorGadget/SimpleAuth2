@@ -1,4 +1,4 @@
-# SimpleAuth
+# SimpleAuth2 (By Shoghicp, hack detection and PIN codes by Awzaw)
 
 Plugin for PocketMine-MP that prevents people to impersonate an account, requering registration and login when connecting.
 
@@ -20,10 +20,11 @@ Plugin for PocketMine-MP that prevents people to impersonate an account, requeri
 
 
 * `/login <password>`
+* `/login <password> <PIN>` (If 2 changes detected for IP, SKIN or CID)
 * `/register <password>`
 * `/unregister <password>` (TODO)
 * For OPs: `/simpleauth <command: help|unregister> [parameters...]` (TODO)
-
+* For Console: `/login <player>` to reset hack detection data for a player
 
 ## Configuration
 
