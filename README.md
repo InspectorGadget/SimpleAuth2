@@ -3,12 +3,19 @@
 ### Automatic Hack protection using IP/CID/SKIN and user PIN codes
 
 ### IMPORTANT
-TO UPDATE AN EXISTING MySQL or SQLITE DATABASE PLEASE RUN THE FOLLOWING QUERIES. FOR THE CAUTIOUS, STOP YOUR SERVER AND BACKUP THE DATABASE FIRST:
+TO UPDATE AN EXISTING MySQL DATABASE PLEASE RUN THE FOLLOWING QUERIES. FOR THE CAUTIOUS, STOP YOUR SERVER AND BACKUP THE DATABASE FIRST:
 
 * `ALTER TABLE simpleauth.simpleauth_players ADD ip VARCHAR(50);`
 * `ALTER TABLE simpleauth.simpleauth_players ADD cid BIGINT;`
 * `ALTER TABLE simpleauth.simpleauth_players ADD skinhash VARCHAR(60);`
 * `ALTER TABLE simpleauth.simpleauth_players ADD pin INT;`
+
+TO UPDATE AN EXISTING SQLITE DATABASE:
+
+* `ALTER TABLE simpleauth.simpleauth_players ADD ip TEXT;`
+* `ALTER TABLE simpleauth.simpleauth_players ADD cid INTEGER;`
+* `ALTER TABLE simpleauth.simpleauth_players ADD skinhash TEXT;`
+* `ALTER TABLE simpleauth.simpleauth_players ADD pin INTEGER;`
 
 Plugin for PocketMine-MP that prevents people to impersonate an account, requering registration and login when connecting.
 
