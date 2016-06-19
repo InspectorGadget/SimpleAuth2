@@ -39,7 +39,7 @@ This fork of SimpleAuth (not forked because the original will probably never be 
 
 When users register (or log in the first time after install or upgrade) they will be given a 4 digit PIN code.
 
-If any player tries to login to an account with more than 1 change to either the previously recorded IP, CID or SKIN then they will
+If any player tries to login to an account with 2 or more changes to the previously recorded IP, CID or SKIN, then they will
 need to login with `/login <password> <PIN>`, for example, `/login zuckerberg dadada 1234`. They will then receive a new PIN.
 
 If a user only changes IP, SKIN or CID the PIN is not required, and the players security info is updated for the new IP/CID/SKIN (not the PIN).
@@ -47,7 +47,7 @@ If a user only changes IP, SKIN or CID the PIN is not required, and the players 
 If a player forgets their PIN, and cannot login because they joined with a new SKIN + IP, SKIN + CID, IP + CID or SKIN + CID
 their security info can be reset on CONSOLE with `login <player>`. They will then get a new PIN code next time they login.
 
-Warnings are displayed on Console when players try to join with > 2 changes to the security info.
+Warnings are displayed on Console when players try to join with >= 2 changes to the security info (IP, CID, SKIN).
 
 SimpleAuth2 is compatible with SimpleAuthHelper, and works with any provider: MySQL (tested), YAML (tested) and SQLITE (untested)
 
