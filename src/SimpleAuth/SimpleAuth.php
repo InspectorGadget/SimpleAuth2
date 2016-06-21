@@ -24,6 +24,7 @@ use pocketmine\utils\Config;
 use pocketmine\permission\PermissionAttachment;
 use pocketmine\permission\Permission;
 use pocketmine\Player;
+use pocketmine\OfflinePlayer;
 use pocketmine\Server;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
@@ -177,7 +178,7 @@ class SimpleAuth extends PluginBase {
 
             $this->provider->registerPlayer($player, $this->hash(strtolower($player->getName()), $password));
             $this->provider->updatePlayer($player, $player->getUniqueId(), $player->getAddress(), time(), $player->getClientId(), hash("md5", $player->getSkinData()), $pin);
-            $player->sendMessage(TEXTFORMAT::AQUA . "SCREENSHOT THIS PIN FOR ACCOUNT RECOVERY: " . TEXTFORMAT::WHITE . $pin);
+            $player->sendMessage(TEXTFORMAT::AQUA . "PLEASE KEEP THIS SECURITY PIN CODE SAFE: " . TEXTFORMAT::WHITE . $pin);
 
             return true;
         }
@@ -243,9 +244,16 @@ class SimpleAuth extends PluginBase {
         switch ($command->getName()) {
             case "login":
                 if ($sender instanceof Player) {
+
+                    if ($this->isPlayerAuthenticated($sender)) {
+                        $pin = mt_rand(1000, 9999);
+                        $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), $pin);
+                        $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . "YOUR SECURITY PIN HAS BEEN CHANGED: " . TEXTFORMAT::WHITE . $pin);
+                        return true;
+                    }
+
                     if (!$this->isPlayerRegistered($sender) or ( $data = $this->provider->getPlayer($sender)) === null) {
                         $sender->sendMessage(TextFormat::RED . $this->getMessage("login.error.registered"));
-
                         return true;
                     }
 
@@ -263,28 +271,32 @@ class SimpleAuth extends PluginBase {
                         if (hash("md5", $sender->getSkinData()) == $data["skinhash"])
                             $concordance++;
 
-                        $this->getLogger()->debug("Current IP: " . $sender->getAddress() . " - Saved IP: " . $data["ip"] ."\n");
-                        $this->getLogger()->debug("Current CID: " . $sender->getClientId() . " - Saved CID: " . $data["cid"] ."\n");
-                        $this->getLogger()->debug("Current SKIN: " . (hash("md5", $sender->getSkinData())) . " - Saved Skin: " . $data["skinhash"] ."\n");
+                        $this->getLogger()->debug("Current IP: " . $sender->getAddress() . " - Saved IP: " . $data["ip"] . "\n");
+                        $this->getLogger()->debug("Current CID: " . $sender->getClientId() . " - Saved CID: " . $data["cid"] . "\n");
+                        $this->getLogger()->debug("Current SKIN: " . (hash("md5", $sender->getSkinData())) . " - Saved Skin: " . $data["skinhash"] . "\n");
 
                         if ($concordance < 2 && (!(isset($args[1]) && ($data["pin"] == $args[1])))) {
-                            
+
                             $this->tryAuthenticatePlayer($sender);
-                            
+
                             $this->getLogger()->info("PLEASE CHECK IF " . $sender->getName() . " HAS BEEN HACKED or NOT\n");
-                            
+
                             $sender->sendMessage(TextFormat::LIGHT_PURPLE . ("For your security, now type <password> <PIN> (with a space)"));
-                            $sender->sendMessage(TextFormat::GREEN . ("You were given your PIN when you registered"));
+                            $sender->sendMessage(TextFormat::GREEN . ("You were given your PIN CODE when you registered"));
                             $sender->sendMessage(TextFormat::RED . ("If you have problems please contact staff"));
-                            $sender->sendMessage(TextFormat::GREEN . ("Or ask CONSOLE to reset your PIN"));
+                            $sender->sendMessage(TextFormat::GREEN . ("Or ask STAFF to reset your PIN"));
                             return true;
                         } else {
                             if ($concordance < 2) {
                                 $pin = mt_rand(1000, 9999);
                                 $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), $pin);
-                                $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . "SCREENSHOT THIS PIN FOR ACCOUNT RECOVERY: " . TEXTFORMAT::WHITE . $pin);
+                                $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . "YOUR SECURITY PIN CODE HAS CHANGED: " . TEXTFORMAT::WHITE . $pin);
                             } else {
+                                //ALL GOOD...
                                 $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), null);
+                                $data = $this->provider->getPlayer($sender);
+                                $pin = $data["pin"];
+                                $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . "YOUR SECURITY PIN CODE HAS NOT CHANGED: " . TEXTFORMAT::WHITE . $pin);
                             }
                         }
                     }
@@ -319,6 +331,15 @@ class SimpleAuth extends PluginBase {
                         $player->sendMessage("Please try to log in again");
                         return true;
                     }
+
+                    $player = $this->getServer()->getOfflinePlayer($args[0]);
+
+                    if ($player instanceof OfflinePlayer) {
+                        $this->provider->updatePlayer($player, null, null, null, null, null, 0);
+                        $sender->sendMessage("Security data reset for " . $player->getName());
+                        return true;
+                    }
+
 
                     $sender->sendMessage(TextFormat::RED . "Player Not Found");
                     return true;

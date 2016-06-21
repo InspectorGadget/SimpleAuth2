@@ -88,7 +88,7 @@ class YAMLDataProvider implements DataProvider{
 			if($ip !== null){
 				$data["ip"] = $ip;
 			}
-                        if($lastID !== null){
+                        if($lastIP !== null){
 				$data["lastip"] = $lastIP;
 			}
 			if($loginDate !== null){
