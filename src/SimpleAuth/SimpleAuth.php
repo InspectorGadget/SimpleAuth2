@@ -286,7 +286,18 @@ class SimpleAuth extends PluginBase {
                             $sender->sendMessage(TextFormat::RED . ("If you have problems please contact staff"));
                             $sender->sendMessage(TextFormat::GREEN . ("Or ask STAFF to reset your PIN"));
                             return true;
-                        } else {
+                        }
+                    }
+
+                    if (hash_equals($data["hash"], $this->hash(strtolower($sender->getName()), $password)) and $this->authenticatePlayer($sender)) {
+
+                        if (!isset($data["pin"])) {
+
+                            $pin = mt_rand(1000, 9999);
+                            $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), $pin);
+                            $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . "SCREENSHOT THIS PIN FOR ACCOUNT RECOVERY: " . TEXTFORMAT::WHITE . $pin);
+                            return true;
+                        }
                             if ($concordance < 2) {
                                 $pin = mt_rand(1000, 9999);
                                 $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), $pin);
@@ -298,18 +309,7 @@ class SimpleAuth extends PluginBase {
                                 $pin = $data["pin"];
                                 $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . "YOUR SECURITY PIN CODE HAS NOT CHANGED: " . TEXTFORMAT::WHITE . $pin);
                             }
-                        }
-                    }
-
-                    if (hash_equals($data["hash"], $this->hash(strtolower($sender->getName()), $password)) and $this->authenticatePlayer($sender)) {
-
-                        if (!isset($data["pin"])) {
-
-                            $pin = mt_rand(1000, 9999);
-                            $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), $pin);
-                            $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . "SCREENSHOT THIS PIN FOR ACCOUNT RECOVERY: " . TEXTFORMAT::WHITE . $pin);
-                        }
-
+                            
                         return true;
                     } else {
                         $this->tryAuthenticatePlayer($sender);
