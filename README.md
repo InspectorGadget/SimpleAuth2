@@ -68,7 +68,7 @@ SimpleAuth2 is compatible with SimpleAuthHelper, and works with any provider: My
 
 ## Configuration
 
-You can modify the _SimpleAuth/config.yml_ file on the _plugins_ directory once the plugin has been run for at least one time.
+You can modify the _SimpleAuth/config.yml_ file on the _plugins_ directory once the plugin has been run for at least once.
 
 | Configuration | Type | Default | Description |
 | :---: | :---: | :---: | :--- |
@@ -81,6 +81,17 @@ You can modify the _SimpleAuth/config.yml_ file on the _plugins_ directory once 
 | dataProviderSettings | array | Sets the settings for the chosen dataProvider |
 | disableRegister | boolean | false | Will set all the permissions for simleauth.command.register to false |
 | disableLogin | boolean | false | Will set all the permissions for simleauth.command.login to false |
+
+## AntiHack Configuration
+
+You can modify the _SimpleAuth/antihack.yml_ file on the _plugins_ directory once the plugin has been run for at least once.
+
+| Configuration | Type | Default | Description |
+| :---: | :---: | :---: | :--- |
+| enabled | boolean | true | Enable AntiHack features |
+| protectsuperadmins | boolean | true | Enable LOGIN protection ONLY for PurePerms SuperAdmin ranks (and OP if enabled) |
+| protectops | boolean | true | Enable LOGIN protection for OPs |
+| threat | integer | 2 | How many out of IP, CID and SKIN must be the same to allow unchecked login |
 
 ## Permissions
 
