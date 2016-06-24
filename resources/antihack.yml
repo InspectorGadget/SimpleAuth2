@@ -1,0 +1,14 @@
+# AntiHack config for SimpleAuth2
+
+#Enable antihack
+enabled: true
+
+#Enable LOGIN protection ONLY for PurePerms SuperAdmin ranks (and OP if enabled)
+protectsuperadmins: true
+
+#Enable LOGIN protection for OPs
+protectops: true
+
+#Threat Level: 1) Low 2) Medium 3) High
+#How many out of IP, CID and SKIN must be the same to allow unrestricted access
+threat: 2
