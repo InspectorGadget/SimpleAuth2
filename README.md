@@ -68,7 +68,7 @@ SimpleAuth2 is compatible with SimpleAuthHelper, and works with any provider: My
 
 ## Configuration
 
-You can modify the _SimpleAuth/config.yml_ file on the _plugins_ directory once the plugin has been run for at least once.
+You can modify the _SimpleAuth/config.yml_ file on the _plugins_ directory once the plugin has been run at least once.
 
 | Configuration | Type | Default | Description |
 | :---: | :---: | :---: | :--- |
@@ -84,7 +84,7 @@ You can modify the _SimpleAuth/config.yml_ file on the _plugins_ directory once 
 
 ## AntiHack Configuration
 
-You can modify the _SimpleAuth/antihack.yml_ file on the _plugins_ directory once the plugin has been run for at least once.
+You can modify the _SimpleAuth/antihack.yml_ file on the _plugins_ directory once the plugin has been run at least once.
 
 | Configuration | Type | Default | Description |
 | :---: | :---: | :---: | :--- |
