@@ -55,7 +55,6 @@ class SimpleAuth extends PluginBase {
     /** @var string[] */
     protected $messages = [];
     protected $messageTask = null;
-    
     private $antihack = [];
     private $purePerms;
 
@@ -103,6 +102,7 @@ class SimpleAuth extends PluginBase {
             $player->removeAttachment($attachment);
             unset($this->needAuth[spl_object_hash($player)]);
         }
+
         $this->provider->updatePlayer($player, $player->getUniqueId(), $player->getAddress(), time());
         $player->sendMessage(TextFormat::GREEN . $this->getMessage("login.success"));
 
@@ -176,7 +176,10 @@ class SimpleAuth extends PluginBase {
             if ($ev->isCancelled()) {
                 return false;
             }
+
             $this->provider->registerPlayer($player, $this->hash(strtolower($player->getName()), $password));
+
+            if (!$this->antihack["enabled"]) return true;
 
             $pin = mt_rand(1000, 9999);
             $this->provider->updatePlayer($player, $player->getUniqueId(), $player->getAddress(), time(), $player->getClientId(), hash("md5", $player->getSkinData()), $pin);
@@ -248,9 +251,11 @@ class SimpleAuth extends PluginBase {
                 if ($sender instanceof Player) {
 
                     if ($this->isPlayerAuthenticated($sender)) {
-                        $pin = mt_rand(1000, 9999);
-                        $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), $pin);
-                        $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . "YOUR SECURITY PIN HAS BEEN CHANGED: " . TEXTFORMAT::WHITE . $pin);
+                        if ($this->antihack["enabled"]) {
+                            $pin = mt_rand(1000, 9999);
+                            $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), $pin);
+                            $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . "YOUR SECURITY PIN HAS BEEN CHANGED: " . TEXTFORMAT::WHITE . $pin);
+                        }
                         return true;
                     }
 
@@ -262,30 +267,29 @@ class SimpleAuth extends PluginBase {
                     $password = $args[0];
 
                     $data = $this->provider->getPlayer($sender);
-                    
                     $superadmin = false;
-                    
-                    if (isset($this->purePerms)){
-                    $currentgroup = $this->purePerms->getUserDataMgr()->getGroup($sender);
-                    $currentgroupName = $currentgroup->getName();
-                    $superadminranks = $this->purePerms->getConfigValue("superadmin-ranks");
-                    $superadmin = isset($this->purePerms) && in_array($currentgroupName, $superadminranks);
+
+                    if (isset($this->purePerms)) {
+                        $currentgroup = $this->purePerms->getUserDataMgr()->getGroup($sender);
+                        $currentgroupName = $currentgroup->getName();
+                        $superadminranks = $this->purePerms->getConfigValue("superadmin-ranks");
+                        $superadmin = isset($this->purePerms) && in_array($currentgroupName, $superadminranks);
                     }
-                    
+
                     $protectsuperadmins = $this->antihack["protectsuperadmins"];
                     $protectops = $this->antihack["protectops"];
-                    
-                    $checkthisrank =  ($protectops && $sender->isOp()) || (!$protectsuperadmins) || ($protectsuperadmins && $superadmin);
-                    
+
+                    $checkthisrank = ($protectops && $sender->isOp()) || (!$protectsuperadmins) || ($protectsuperadmins && $superadmin);
+
                     $concordance = 0;
 
-                        if ($sender->getAddress() == $data["ip"])
-                            $concordance++;
-                        if ($sender->getClientId() == $data["cid"])
-                            $concordance++;
-                        if (hash("md5", $sender->getSkinData()) == $data["skinhash"])
-                            $concordance++;
-                        
+                    if ($sender->getAddress() == $data["ip"])
+                        $concordance++;
+                    if ($sender->getClientId() == $data["cid"])
+                        $concordance++;
+                    if (hash("md5", $sender->getSkinData()) == $data["skinhash"])
+                        $concordance++;
+
                     if ($checkthisrank && isset($data["pin"]) && ($this->antihack["enabled"])) {
 
 
@@ -309,6 +313,9 @@ class SimpleAuth extends PluginBase {
 
                     if (hash_equals($data["hash"], $this->hash(strtolower($sender->getName()), $password)) and $this->authenticatePlayer($sender)) {
 
+                        if (!$this->antihack["enabled"])
+                            return true;
+
                         if (!isset($data["pin"])) {
 
                             $pin = mt_rand(1000, 9999);
@@ -316,18 +323,18 @@ class SimpleAuth extends PluginBase {
                             $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . "SCREENSHOT THIS PIN FOR ACCOUNT RECOVERY: " . TEXTFORMAT::WHITE . $pin);
                             return true;
                         }
-                            if ($concordance < ($this->antihack["threat"])) {
-                                $pin = mt_rand(1000, 9999);
-                                $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), $pin);
-                                $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . "YOUR SECURITY PIN CODE HAS CHANGED: " . TEXTFORMAT::WHITE . $pin);
-                            } else {
-                                //ALL GOOD...
-                                $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), null);
-                                $data = $this->provider->getPlayer($sender);
-                                $pin = $data["pin"];
-                                $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . "YOUR SECURITY PIN CODE HAS NOT CHANGED: " . TEXTFORMAT::WHITE . $pin);
-                            }
-                            
+                        if ($concordance < ($this->antihack["threat"])) {
+                            $pin = mt_rand(1000, 9999);
+                            $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), $pin);
+                            $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . "YOUR SECURITY PIN CODE HAS CHANGED: " . TEXTFORMAT::WHITE . $pin);
+                        } else {
+                            //ALL GOOD...
+                            $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), null);
+                            $data = $this->provider->getPlayer($sender);
+                            $pin = $data["pin"];
+                            $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . "YOUR SECURITY PIN CODE HAS NOT CHANGED: " . TEXTFORMAT::WHITE . $pin);
+                        }
+
                         return true;
                     } else {
                         $this->tryAuthenticatePlayer($sender);
@@ -421,7 +428,7 @@ class SimpleAuth extends PluginBase {
         $this->saveResource("messages.yml", false);
         $messages = (new Config($this->getDataFolder() . "messages.yml"))->getAll();
         $this->messages = $this->parseMessages($messages);
-        
+
         $this->saveResource("antihack.yml", false);
         $this->antihack = (new Config($this->getDataFolder() . "antihack.yml"))->getAll();
 
@@ -471,9 +478,7 @@ class SimpleAuth extends PluginBase {
         }
 
         $this->purePerms = $this->getServer()->getPluginManager()->getPlugin("PurePerms");
-
         $this->getLogger()->info("Everything loaded!");
-        
     }
 
     public function onDisable() {
