@@ -179,11 +179,16 @@ class SimpleAuth extends PluginBase {
 
             $this->provider->registerPlayer($player, $this->hash(strtolower($player->getName()), $password));
 
-            if (!$this->antihack["enabled"]) return true;
+            if (!$this->antihack["enabled"])
+                return true;
 
             $pin = mt_rand(1000, 9999);
-            $this->provider->updatePlayer($player, $player->getUniqueId(), $player->getAddress(), time(), $player->getClientId(), hash("md5", $player->getSkinData()), $pin);
-            $player->sendMessage(TEXTFORMAT::AQUA . "PLEASE KEEP THIS SECURITY PIN CODE SAFE: " . TEXTFORMAT::WHITE . $pin);
+            $update = $this->provider->updatePlayer($player, $player->getUniqueId(), $player->getAddress(), time(), $player->getClientId(), hash("md5", $player->getSkinData()), $pin);
+            if ($update) {
+                $player->sendMessage(TEXTFORMAT::AQUA . $this->antihack["pinregister"] . TEXTFORMAT::WHITE . $pin);
+            } else {
+                $player->sendMessage(TEXTFORMAT::RED . $this->antihack["pinerror"] . TEXTFORMAT::WHITE . $pin);
+            }
 
             return true;
         }
@@ -253,8 +258,12 @@ class SimpleAuth extends PluginBase {
                     if ($this->isPlayerAuthenticated($sender)) {
                         if ($this->antihack["enabled"]) {
                             $pin = mt_rand(1000, 9999);
-                            $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), $pin);
-                            $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . "YOUR SECURITY PIN HAS BEEN CHANGED: " . TEXTFORMAT::WHITE . $pin);
+                            $updated = $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), $pin);
+                            if ($updated) {
+                                $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . $this->antihack["pinchanged"] . TEXTFORMAT::WHITE . $pin);
+                            } else {
+                                $sender->sendMessage(TEXTFORMAT::RED . $this->antihack["pinerror"]);
+                            }
                         }
                         return true;
                     }
@@ -301,12 +310,12 @@ class SimpleAuth extends PluginBase {
 
                             $this->tryAuthenticatePlayer($sender);
 
-                            $this->getLogger()->info("PLEASE CHECK IF " . $sender->getName() . " HAS BEEN HACKED or NOT\n");
+                            $this->getLogger()->info($this->antihack["hackwarning"] . $sender->getName());
 
-                            $sender->sendMessage(TextFormat::LIGHT_PURPLE . ("For your security, now type <password> <PIN> (with a space)"));
-                            $sender->sendMessage(TextFormat::GREEN . ("You were given your PIN CODE when you registered"));
-                            $sender->sendMessage(TextFormat::RED . ("If you have problems please contact staff"));
-                            $sender->sendMessage(TextFormat::GREEN . ("Or ask STAFF to reset your PIN"));
+                            $sender->sendMessage(TextFormat::RED . ($this->antihack["pinhelp1"]));
+                            $sender->sendMessage(TextFormat::GOLD . ($this->antihack["pinhelp2"]));
+                            $sender->sendMessage(TextFormat::RED . ($this->antihack["pinhelp3"]));
+                            $sender->sendMessage(TextFormat::LIGHT_PURPLE . ($this->antihack["pinhelp4"]));
                             return true;
                         }
                     }
@@ -319,20 +328,32 @@ class SimpleAuth extends PluginBase {
                         if (!isset($data["pin"])) {
 
                             $pin = mt_rand(1000, 9999);
-                            $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), $pin);
-                            $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . "SCREENSHOT THIS PIN FOR ACCOUNT RECOVERY: " . TEXTFORMAT::WHITE . $pin);
+                            $updated = $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), $pin);
+                            if ($updated) {
+                                $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . $this->antihack["pintext"] . TEXTFORMAT::WHITE . $pin);
+                            } else {
+                                $sender->sendMessage(TEXTFORMAT::RED . $this->antihack["pinerror"]);
+                            }
                             return true;
                         }
                         if ($concordance < ($this->antihack["threat"])) {
                             $pin = mt_rand(1000, 9999);
-                            $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), $pin);
-                            $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . "YOUR SECURITY PIN CODE HAS CHANGED: " . TEXTFORMAT::WHITE . $pin);
+                            $updated = $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), $pin);
+                            if ($updated) {
+                                $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . $this->antihack["pinchanged"] . TEXTFORMAT::WHITE . $pin);
+                            } else {
+                                $sender->sendMessage(TEXTFORMAT::RED . $this->antihack["pinerror"]);
+                            }
                         } else {
                             //ALL GOOD...
-                            $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), null);
+                            $updated = $this->provider->updatePlayer($sender, $sender->getUniqueId(), $sender->getAddress(), time(), $sender->getClientId(), hash("md5", $sender->getSkinData()), null);
                             $data = $this->provider->getPlayer($sender);
                             $pin = $data["pin"];
-                            $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . "YOUR SECURITY PIN CODE HAS NOT CHANGED: " . TEXTFORMAT::WHITE . $pin);
+                            if ($updated) {
+                                $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . $this->antihack["pinunchanged"] . TEXTFORMAT::WHITE . $pin);
+                            } else {
+                                $sender->sendMessage(TEXTFORMAT::RED . $this->antihack["pinerror"]);
+                            }
                         }
 
                         return true;
@@ -344,29 +365,36 @@ class SimpleAuth extends PluginBase {
                     }
                 } else {//Console reset Security Checks for a player
                     if (!isset($args[0])) {
-                        $sender->sendMessage("Type /login <player> to reset security checks for a player");
+                        $sender->sendMessage($this->antihack["consolehelp"]);
                         return true;
                     }
 
                     $player = $this->getServer()->getPlayer($args[0]);
 
                     if ($player instanceof Player) {
-                        $this->provider->updatePlayer($player, $player->getUniqueId(), $player->getAddress(), time(), $player->getClientId(), hash("md5", $player->getSkinData()), 0);
-                        $sender->sendMessage("Security data reset for " . $player->getName());
-                        $player->sendMessage("Please try to log in again");
+                        $updated = $this->provider->updatePlayer($player, $player->getUniqueId(), $player->getAddress(), time(), $player->getClientId(), hash("md5", $player->getSkinData()), 0);
+
+                        if ($updated) {
+                            $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . $this->antihack["pinreset"] . $player->getName());
+                        } else {
+                            $sender->sendMessage(TEXTFORMAT::RED . $this->antihack["pinerror"]);
+                        }
+
                         return true;
                     }
 
                     $player = $this->getServer()->getOfflinePlayer($args[0]);
 
                     if ($player instanceof OfflinePlayer) {
-                        $this->provider->updatePlayer($player, null, null, null, null, null, 0);
-                        $sender->sendMessage("Security data reset for " . $player->getName());
+                        $updated = $this->provider->updatePlayer($player, null, null, null, null, null, 0);
+                        if ($updated) {
+                            $sender->sendMessage(TEXTFORMAT::LIGHT_PURPLE . $this->antihack["pinreset"] . $player->getName());
+                        } else {
+                            $sender->sendMessage(TEXTFORMAT::RED . $this->antihack["pinerror"]);
+                        }
                         return true;
                     }
-
-
-                    $sender->sendMessage(TextFormat::RED . "Player Not Found");
+                    $sender->sendMessage(TextFormat::RED . $this->antihack["noplayer"]);
                     return true;
                 }
                 break;
@@ -478,6 +506,12 @@ class SimpleAuth extends PluginBase {
         }
 
         $this->purePerms = $this->getServer()->getPluginManager()->getPlugin("PurePerms");
+        if (isset($this->purePerms)) {
+            $this->getLogger()->info("Connected to PurePerms");
+        } else {
+            $this->getLogger()->info("Could Not Find PurePerms");
+        }
+
         $this->getLogger()->info("Everything loaded!");
     }
 
