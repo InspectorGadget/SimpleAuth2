@@ -273,7 +273,7 @@ class SimpleAuth extends PluginBase {
                         $currentgroup = $this->purePerms->getUserDataMgr()->getGroup($sender);
                         $currentgroupName = $currentgroup->getName();
                         $superadminranks = $this->purePerms->getConfigValue("superadmin-ranks");
-                        $superadmin = isset($this->purePerms) && in_array($currentgroupName, $superadminranks);
+                        $superadmin = in_array($currentgroupName, $superadminranks);
                     }
 
                     $protectsuperadmins = $this->antihack["protectsuperadmins"];
@@ -313,7 +313,7 @@ class SimpleAuth extends PluginBase {
 
                     if (hash_equals($data["hash"], $this->hash(strtolower($sender->getName()), $password)) and $this->authenticatePlayer($sender)) {
 
-                        if (!$this->antihack["enabled"])
+                        if (!$this->antihack["enabled"] || !$checkthisrank)
                             return true;
 
                         if (!isset($data["pin"])) {
