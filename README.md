@@ -1,4 +1,4 @@
-# SimpleAuth2 (Shoghicp/Awzaw)
+# SimpleAuth2 - Shoghicp (antihack by Awzaw)
 
 ### Automatic Hack protection using IP/CID/SKIN and user PIN codes
 
