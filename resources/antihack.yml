@@ -1,7 +1,7 @@
 # AntiHack config for SimpleAuth2
 
 #Enable antihack
-enabled: true
+enabled: false
 
 #Enable LOGIN protection ONLY for PurePerms SuperAdmin ranks (and OP if enabled)
 protectsuperadmins: true
