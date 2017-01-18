@@ -106,7 +106,7 @@ class SimpleAuth extends PluginBase {
         $this->provider->updatePlayer($player, $player->getUniqueId(), $player->getAddress(), time());
         $player->recalculatePermissions();
         $player->sendMessage(TextFormat::GREEN . $this->getMessage("login.success"));
-        
+
         $this->getMessageTask()->removePlayer($player);
 
         unset($this->blockSessions[$player->getAddress() . ":" . strtolower($player->getName())]);
